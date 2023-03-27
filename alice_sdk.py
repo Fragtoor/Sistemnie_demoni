@@ -1,6 +1,3 @@
-import json
-
-
 class AliceRequest(object):
     def __init__(self, request_dict):
         self._request_dict = request_dict
@@ -51,12 +48,12 @@ class AliceResponse(object):
             }
         }
 
-    def dumps(self):
-        return json.dumps(
-            self._response_dict,
-            ensure_ascii=False,
-            indent=2
-        )
+    # def dumps(self):
+    #     return json.dumps(
+    #         self._response_dict,
+    #         ensure_ascii=False,
+    #         indent=2
+    #     )
 
     def set_text(self, text):
         self._response_dict['response']['text'] = text[:1024]
