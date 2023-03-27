@@ -1,0 +1,46 @@
+{
+  "meta": {
+    "locale": "ru-RU",
+    "timezone": "UTC",
+    "client_id": "ru.yandex.searchplugin/7.16 (none none; android 4.4.2)",
+    "interfaces": {
+      "screen": {},
+      "payments": {},
+      "account_linking": {}
+    }
+  },
+  "session": {
+    "message_id": 0,
+    "session_id": "ab4dac6c-ec7c-4e19-8a0b-9fe6a1aeb4c7",
+    "skill_id": "3c6be265-55bb-448d-8db0-804aaf4bd368",
+    "user": {
+      "user_id": "B87D1E087BE4D60AD9A39F6034E68EB6B935902D09FBBE4C8B4FBC21BC1F7999"
+    },
+    "application": {
+      "application_id": "D9163A668E4470BB209ECA3533F46B5E7AB8B88F0EEE1316BE2CE60D0BC5023E"
+    },
+    "user_id": "D9163A668E4470BB209ECA3533F46B5E7AB8B88F0EEE1316BE2CE60D0BC5023E",
+    "new": true
+  },
+  "request": {
+    "command": "залупка",
+    "original_utterance": "залупка",
+    "nlu": {
+      "tokens": [
+        "залупка"
+      ],
+      "entities": [],
+      "intents": {}
+    },
+    "markup": {
+      "dangerous_context": false
+    },
+    "type": "SimpleUtterance"
+  },
+  "state": {
+    "session": {},
+    "user": {},
+    "application": {}
+  },
+  "version": "1.0"
+}
