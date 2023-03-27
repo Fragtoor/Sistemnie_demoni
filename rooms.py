@@ -34,3 +34,9 @@ def quadraticEquationGenerator():
         return str_, [x]
     else:
         return str_, []
+
+def EquationSystem():
+    return " Пока не реализовано, чтобы пропустить напишите 'ответа нет'", []
+
+def Unequation():
+    return " Пока не реализовано, чтобы пропустить напишите 'ответа нет'", []

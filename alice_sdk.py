@@ -48,8 +48,10 @@ class AliceResponse(object):
             "version": alice_request.version,
             "session": alice_request.session,
             "response": {
-                "end_session": False
+                "end_session": False,
+
             }
+
         }
 
     # def dumps(self):
@@ -58,6 +60,12 @@ class AliceResponse(object):
     #         ensure_ascii=False,
     #         indent=2
     #     )
+    def bigcard(self, image_id, title, description):
+        self._response_dict["response"]["card"] = {}
+        self._response_dict["response"]["card"]["type"] = "BigImage"
+        self._response_dict["response"]["card"]["image_id"] = image_id
+        self._response_dict["response"]["card"]["title"] = title
+        self._response_dict["response"]["card"]["description"] = description
 
     def set_text(self, text):
         self._response_dict['response']['text'] = text[:1024]
