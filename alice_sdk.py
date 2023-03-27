@@ -23,6 +23,10 @@ class AliceRequest(object):
         return self._request_dict['request']['command']
 
     @property
+    def original_utterance(self) -> str:
+        return self._request_dict['request']['original_utterance']
+
+    @property
     def session_state(self):
         return self._request_dict['state']['session']
 

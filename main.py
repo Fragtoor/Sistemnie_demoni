@@ -3,20 +3,13 @@ import random
 import rooms
 from alice_sdk import *
 
-permitted_classes = [8, 9, 10, 11]
-subject_dictionary = {
-    0: "Математика",
-    1: "Русский язык",
-    2: "Информатика",
-    3: "Физика"
-}
-
 YesAnswers = ["да", "конечно", "ага", "согласен", "приступим", "начнем", "продолжим", "ок"]
 NoAnswers = ["нет", "откажусь", "неа"]
 
 #тут заданы варианты комнат, их описания и функции соответствующие им.
 rooms_variants = {
-    "Решение простых выражений": ["Тебе потребуется решить простое выражение и сказать ответ в целых числах (округляя дробный результат). Выражение: ",rooms.simpleExpressionGenerator]
+    "Решение простых выражений": ["Тебе потребуется решить простое выражение и сказать ответ в целых числах (округляя дробный результат). Выражение: ",rooms.simpleExpressionGenerator],
+    "Решение квадратных уравнений": ["Здесь тебе нужно найти корни квадратного уравнения и сказать ответ в целых числах, ответы разделяются точкой с запятой. Если ответа нет скажи 'ответа нет'. Уравнение: ", rooms.quadraticEquationGenerator]
 }
 
 
@@ -71,6 +64,10 @@ def handler(event, context):
                     resp.set_session_state(
                         {"stage": req.session_state["stage"], "leftRight": False, "think": True, "waitedResult": result,
                          "score": req.session_state["score"]})
+                else:
+                    resp.set_session_state(req.session_state)
+                    resp.set_text(f"Пожалуйста ответь вправо или влево")
+
             except Exception as e:
                 resp.set_text(f"Произошла ошибка: {e}")
                 resp.end()
@@ -79,17 +76,21 @@ def handler(event, context):
         if (req.session_state["think"]):
 
             try:
-                res = int(req.command)
+                if (req.original_utterance.lower() != "ответа нет"):
+                    res = list(map(int,req.original_utterance.replace(" ", "").split(";")))
+                else:
+                    res = []
             except:
-                resp.set_text(f"Пожалуйста ответь одним целым числом.")
+                resp.set_session_state(req.session_state)
+                resp.set_text(f"Пожалуйста ответь в целых числах. Если ответов несколько они разделяются знаком ;. Если ответа нет скажи 'ответа нет'")
                 return resp.dictionary
-            if (req.session_state["waitedResult"] == res):
+            if (req.session_state["waitedResult"].sort() == res.sort()):
                 resp.set_text(f"Молодец, ответь влево или вправо пойдешь дальше.")
                 resp.set_session_state({"stage": req.session_state["stage"] + 1, "leftRight": True, "think": False,
                                         "score": req.session_state["score"] + 1})
             else:
                 resp.set_text(
-                    f"Правильным ответом было {req.session_state['waitedResult']}. Скажи вправо или влево пойдешь дальше.")
+                    f"Правильным ответом было {';'.join(req.session_state['waitedResult'])}. Скажи вправо или влево пойдешь дальше.")
                 resp.set_session_state({"stage": req.session_state["stage"] + 1, "leftRight": True, "think": False,
                                         "score": req.session_state["score"]})
 
