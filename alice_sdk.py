@@ -19,20 +19,20 @@ class AliceRequest(object):
         return bool(self.session['new'])
 
     @property
-    def command(self):
+    def command(self) -> str:
         return self._request_dict['request']['command']
 
     @property
     def session_state(self):
-        return self._request_dict['request']['state']['session']
+        return self._request_dict['state']['session']
 
     @property
     def user_state(self):
-        return self._request_dict['request']['state']['user']
+        return self._request_dict['state']['user']
 
     @property
     def application_state(self):
-        return self._request_dict['request']['state']['application']
+        return self._request_dict['state']['application']
 
     def __str__(self):
         return str(self._request_dict)
@@ -63,15 +63,15 @@ class AliceResponse(object):
 
     def set_app_state(self, state):
         """В функцию подавать словарь значений без вложенности"""
-        self._response_dict['response']["application_state"] = state
+        self._response_dict["application_state"] = state
 
     def set_session_state(self, state):
         """В функцию подавать словарь значений без вложенности"""
-        self._response_dict['response']["session_state"] = state
+        self._response_dict["session_state"] = state
 
     def update_user_state(self, state):
         """В функцию подавать словарь значений без вложенности"""
-        self._response_dict['response']["user_state_update"] = state
+        self._response_dict["user_state_update"] = state
 
     def end(self):
         self._response_dict["response"]["end_session"] = True
