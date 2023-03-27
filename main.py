@@ -3,8 +3,7 @@ import random
 import rooms
 from alice_sdk import *
 
-
-permitted_classes = [8,9,10,11]
+permitted_classes = [8, 9, 10, 11]
 subject_dictionary = {
     0: "Математика",
     1: "Русский язык",
@@ -12,11 +11,13 @@ subject_dictionary = {
     3: "Физика"
 }
 
-YesAnswers = ["да", "конечно", "ага","согласен","приступим","начнем","продолжим","ок"]
+YesAnswers = ["да", "конечно", "ага", "согласен", "приступим", "начнем", "продолжим", "ок"]
 NoAnswers = ["нет", "откажусь", "неа"]
 
-rooms_variants = {"Решение простых выражений": ["Тебе потребуется решить простое выражение и сказать ответ в целых числах (округляя дробный результат). Выражение: ", rooms.simpleExpressionGenerator]}
-
+#тут заданы варианты комнат, их описания и функции соответствующие им.
+rooms_variants = {
+    "Решение простых выражений": ["Тебе потребуется решить простое выражение и сказать ответ в целых числах (округляя дробный результат). Выражение: ",rooms.simpleExpressionGenerator]
+}
 
 
 def handler(event, context):
@@ -25,15 +26,16 @@ def handler(event, context):
     resp = AliceResponse(req)
 
     if req.is_new_session:
-        answers = ['Привет! Я помогу тебе подготовиться к ОГЭ по математике. Приступим?']
+        answers = ['Привет! Я помогу тебе потренировать свои навыки в математике. Приступим?']
         resp.set_text(answers[0])
         resp.set_session_state({"stage": 1})
         return resp.dictionary
 
     if req.session_state["stage"] == 1:
         if (x in req.command.lower() for x in YesAnswers):
-            resp.set_text("Ты оказываешься один в закрытой школе. Чтобы выбраться тебе нужно пройти по комнатам и выполнить несколько заданий. В пойдешь вправо или влево?")
-            resp.set_session_state({"stage": 2, "leftRight": True, "think": False})
+            resp.set_text(
+                "Ты оказываешься один в закрытой школе. Чтобы выбраться тебе нужно пройти по комнатам и выполнить несколько заданий. В пойдешь вправо или влево?")
+            resp.set_session_state({"stage": 2, "leftRight": True, "think": False, "score": 0})
             return resp.dictionary
         elif (x in req.command.lower() for x in NoAnswers):
             resp.set_text("Ну ладно")
@@ -44,19 +46,35 @@ def handler(event, context):
             resp.set_session_state({"stage": 1})
             return resp.dictionary
 
+    if req.session_state["stage"] >= 12:
+        if req.session_state["score"] >= 5:
+            resp.set_text(
+                f"Поздравляю, ты наконец выбрался из закрытой школы. Твой результат: {req.session_state['score']} из 10 правильно решёных заданий")
+            resp.end()
+        else:
+            resp.set_text(
+                f"К сожалению ты остаешься в школе. Ты будешь решать задания до тех пор пока не решишь верно.")
+            resp.set_session_state({"stage": 1, "leftRight": False, "think": False, "score": 0})
+        return resp.dictionary
+
     if req.session_state["stage"] > 1:
         if (req.session_state["leftRight"]):
-            if req.command.lower() in ("вправо","влево"):
+            try:
+                if req.command.lower() in ("вправо", "влево"):
+                    name = random.choice(list(rooms_variants.keys()))
+                    values = rooms_variants[name]
+                    description = values[0]
+                    fun = values[1]
+                    exp, result = fun()
 
-                name = random.choice(rooms_variants.keys())
-                values = rooms_variants[name]
-                description = values[0]
-                fun = values[1]
-                exp, result = fun()
-
-
-                resp.set_text(f"Прекрасно, ты оказался в комнате под названием '{name}'. {description}{exp}")
-                resp.set_session_state({"stage": req.session_state["stage"], "leftRight": False, "think": True, "waitedResult": result})
+                    resp.set_text(f"Прекрасно, ты оказался в комнате под названием '{name}'. {description}{exp}")
+                    resp.set_session_state(
+                        {"stage": req.session_state["stage"], "leftRight": False, "think": True, "waitedResult": result,
+                         "score": req.session_state["score"]})
+            except Exception as e:
+                resp.set_text(f"Произошла ошибка: {e}")
+                resp.end()
+                return resp.dictionary
 
         if (req.session_state["think"]):
 
@@ -67,15 +85,12 @@ def handler(event, context):
                 return resp.dictionary
             if (req.session_state["waitedResult"] == res):
                 resp.set_text(f"Молодец, ответь влево или вправо пойдешь дальше.")
-                resp.set_session_state({"stage": req.session_state["stage"] + 1, "leftRight": True, "think": False})
+                resp.set_session_state({"stage": req.session_state["stage"] + 1, "leftRight": True, "think": False,
+                                        "score": req.session_state["score"] + 1})
             else:
-                resp.set_text(f"Правильным ответом было {req.session_state['waitedResult']}. Скажи вправо или влево пойдешь дальше.")
-                resp.set_session_state({"stage": req.session_state["stage"] + 1, "leftRight": True, "think": False})
-
-
+                resp.set_text(
+                    f"Правильным ответом было {req.session_state['waitedResult']}. Скажи вправо или влево пойдешь дальше.")
+                resp.set_session_state({"stage": req.session_state["stage"] + 1, "leftRight": True, "think": False,
+                                        "score": req.session_state["score"]})
 
     return resp.dictionary
-
-
-
-

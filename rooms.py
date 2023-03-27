@@ -2,10 +2,10 @@ import random
 
 
 def simpleExpressionGenerator():
-    str = ""
+    str_ = ""
     for i in range(10):
-        str += random.randint(0,25)
-        str += random.choice(["+","-","*","/"])
-    str += random.randint(0,25)
+        str_ += str(random.randint(1,25))
+        str_ += random.choice(["+","-","*","/"])
+    str_ += str(random.randint(1,25))
 
-    return str, round(eval(str))
+    return str_, round(eval(str_))
