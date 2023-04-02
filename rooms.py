@@ -1,4 +1,4 @@
-import random
+import random, json
 
 
 def simpleExpressionGenerator():
@@ -70,7 +70,14 @@ def quadraticEquationGenerator():
 
 
 def EquationSystem():
-    return " Пока не реализовано, чтобы пропустить напишите 'ответа нет'", []
+    rooms_ = json.load(open("EquationSystems.json", "r"))
+
+    room = random.choice(rooms_["list"])
+    answers = room["answers"]
+    image = room["image"]
+
+
+    return "", answers, image
 
 
 def Unequation():
