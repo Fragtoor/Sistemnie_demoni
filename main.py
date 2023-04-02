@@ -3,6 +3,7 @@ import re
 
 import rooms
 from alice_sdk import *
+DEBUGINFO = " "
 
 schoolPhotoId = "1652229/bad8c0c5414c0417c80d"
 
@@ -22,13 +23,15 @@ WhatYouCan = ["В мою основную функцию входит подго
 rooms_variants = {
     "Решение простых выражений": ["Тебе потребуется решить простое выражение и сказать ответ в целых числах (округляя дробный результат). Выражение: ",rooms.simpleExpressionGenerator],
     "Решение квадратных уравнений": ["Здесь тебе нужно найти корни квадратного уравнения и сказать ответ в целых числах, ответы разделяются точкой с запятой. Если ответа нет скажи 'ответа нет'. Уравнение: ", rooms.quadraticEquationGenerator],
-    "Поиск решение к неравенству": ["Решение какого из данных неравенств изображено на рисунке", rooms.Unequation],
     "Решение системы уравнений": ["Найди сумму X+Y и назови её в целых числах", rooms.EquationSystem],
-    "Решение линейных уравнений": ["Найдите корни уравнения", rooms.EquationSystem]
+    "Вероятности": ["Ответ дайте в процентах: ", rooms.Chances],
+    "Прогрессии": ["", rooms.Progressions],
+    "Графики": ["", rooms.Graphs]
 }
 
 
 def handler(event, context):
+    global DEBUGINFO
     req = AliceRequest(event)
 
     resp = AliceResponse(req)
@@ -89,7 +92,7 @@ def handler(event, context):
     if req.session_state["stage"] > 1:
         if (req.session_state["leftRight"]):
             try:
-                if re.match("лев|прав",req.command.lower()):
+                if re.search("лев|прав",req.command.lower()):
                     name = random.choice(list(rooms_variants.keys()))
                     values = rooms_variants[name]
                     description = values[0]
@@ -99,7 +102,8 @@ def handler(event, context):
                     if image is None:
                         resp.set_text(f"Прекрасно, ты оказался в комнате под названием '{name}'. {description}{exp}")
                     else:
-                        resp.bigcard(image,f"Прекрасно, ты оказался в комнате под названием '{name}'.", f"{description}" )
+                        resp.set_text(f"Прекрасно, ты оказался в комнате под названием '{name}'. {description}")
+                        resp.bigcard(image,f"Прекрасно, ты оказался в комнате под названием '{name}'.", f"{description}{exp}" )
 
                     resp.set_session_state(
                         {"stage": req.session_state["stage"], "leftRight": False, "think": True, "waitedResult": result,
@@ -126,12 +130,18 @@ def handler(event, context):
 
             try:
                 if (req.original_utterance.lower() != "ответа нет"):
-                    res = list(map(int,req.original_utterance.replace(" ", "").split("и")))
+                    exp = r"^([+-]?\d+)[\s;и,]*([+-]?\d+)?[\s;,.%мсг]*$"
+                    #res = list(map(int,req.original_utterance.replace(" ", "").split("и")))
+                    searched = list(re.search(exp,req.original_utterance).groups())
+                    if None in searched:
+                        searched.remove(None)
+                    DEBUGINFO = searched
+                    res = list(map(int, searched))
                 else:
                     res = []
-            except:
+            except Exception as e:
                 resp.set_session_state(req.session_state)
-                resp.set_text(f"Пожалуйста ответь в целых числах. Если ответов несколько называй их через И. Если ответа нет, скажи 'ответа нет'")
+                resp.set_text(f"Пожалуйста ответь в целых числах. Если ответов несколько называй их через И. Если ответа нет, скажи 'ответа нет'.")
                 resp.set_buttons([{"title": "Ответа нет", "hide": True}, {"title": "Выход", "hide": True}])
                 return resp.dictionary
             if (sorted(req.session_state["waitedResult"]) == sorted(res)):
