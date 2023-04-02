@@ -154,7 +154,7 @@ def handler(event, context):
                     resp.set_session_state(
                         {"stage": req.session_state["stage"], "leftRight": False, "think": True, "waitedResult": result,
                          "score": req.session_state["score"]})
-                    resp.set_buttons([{"title": "Ответа нет", "hide": True}, {"title": "Помощь", "hide": True}, {"title": "Выход", "hide": True}])
+                    resp.set_buttons([{"title": "Помощь", "hide": True}, {"title": "Выход", "hide": True}])
                 else:
                     resp.set_session_state(req.session_state)
                     resp.set_text(f"Пожалуйста ответь вправо или влево")
@@ -192,8 +192,8 @@ def handler(event, context):
                     res = []
             except Exception as e:
                 resp.set_session_state(req.session_state)
-                resp.set_text(f"Пожалуйста ответь в целых числах. Если ответов несколько называй их через И. Если ответа нет, скажи 'ответа нет'.")
-                resp.set_buttons([{"title": "Ответа нет", "hide": True}, {"title": "Выход", "hide": True}])
+                resp.set_text(f"Пожалуйста ответь в целых числах. Если ответов несколько называй их через И.")
+                resp.set_buttons([{"title": "Выход", "hide": True}])
                 return resp.dictionary
             if (sorted(req.session_state["waitedResult"]) == sorted(res)):
                 resp.set_text(random.choice(GoodPhrases))
