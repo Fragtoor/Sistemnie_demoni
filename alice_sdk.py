@@ -60,6 +60,7 @@ class AliceResponse(object):
     #         ensure_ascii=False,
     #         indent=2
     #     )
+
     def bigcard(self, image_id, title, description):
         self._response_dict["response"]["card"] = {}
         self._response_dict["response"]["card"]["type"] = "BigImage"
