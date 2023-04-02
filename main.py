@@ -36,11 +36,9 @@ rooms_variants = {
 def handler(event, context):
     global DEBUGINFO
 
-
     req = AliceRequest(event)
 
     resp = AliceResponse(req)
-
 
     if req.command == "" and req.original_utterance == "ping":
         resp.set_text("pong")
