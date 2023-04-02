@@ -30,7 +30,7 @@ rooms_variants = {
     "Прогрессии": ["", rooms.Progressions],
     "Графики": ["", rooms.Graphs],
     "Геометрические выражения": ["", rooms.GeometricalExpressions],
-    "Линейные уравнения": ["Найди X и дай ответ округляя: ", rooms.SimpleEquation],
+    "Линейные уравнения": ["Найди корень уравнения. Ответ округли до целого числа: ", rooms.SimpleEquation],
     "Геометрия": ["", rooms.Geometry]
 }
 
