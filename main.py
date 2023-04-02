@@ -1,4 +1,5 @@
 import random
+import re
 
 import rooms
 from alice_sdk import *
@@ -22,7 +23,7 @@ rooms_variants = {
     "Решение простых выражений": ["Тебе потребуется решить простое выражение и сказать ответ в целых числах (округляя дробный результат). Выражение: ",rooms.simpleExpressionGenerator],
     "Решение квадратных уравнений": ["Здесь тебе нужно найти корни квадратного уравнения и сказать ответ в целых числах, ответы разделяются точкой с запятой. Если ответа нет скажи 'ответа нет'. Уравнение: ", rooms.quadraticEquationGenerator],
     "Поиск решение к неравенству": ["Решение какого из данных неравенств изображено на рисунке", rooms.Unequation],
-    "Решение системы уравнений": ["Найдите X и Y системы уравнений", rooms.EquationSystem],
+    "Решение системы уравнений": ["Найди сумму X+Y и назови её в целых числах", rooms.EquationSystem],
     "Решение линейных уравнений": ["Найдите корни уравнения", rooms.EquationSystem]
 }
 
@@ -88,14 +89,18 @@ def handler(event, context):
     if req.session_state["stage"] > 1:
         if (req.session_state["leftRight"]):
             try:
-                if req.command.lower() in ("вправо", "влево"):
+                if re.match("лев|прав",req.command.lower()):
                     name = random.choice(list(rooms_variants.keys()))
                     values = rooms_variants[name]
                     description = values[0]
                     fun = values[1]
-                    exp, result = fun()
+                    exp, result, image = fun()
 
-                    resp.set_text(f"Прекрасно, ты оказался в комнате под названием '{name}'. {description}{exp}")
+                    if image is None:
+                        resp.set_text(f"Прекрасно, ты оказался в комнате под названием '{name}'. {description}{exp}")
+                    else:
+                        resp.bigcard(image,f"Прекрасно, ты оказался в комнате под названием '{name}'.", f"{description}" )
+
                     resp.set_session_state(
                         {"stage": req.session_state["stage"], "leftRight": False, "think": True, "waitedResult": result,
                          "score": req.session_state["score"]})
@@ -121,12 +126,12 @@ def handler(event, context):
 
             try:
                 if (req.original_utterance.lower() != "ответа нет"):
-                    res = list(map(int,req.original_utterance.replace(" ", "").split(";")))
+                    res = list(map(int,req.original_utterance.replace(" ", "").split("и")))
                 else:
                     res = []
             except:
                 resp.set_session_state(req.session_state)
-                resp.set_text(f"Пожалуйста ответь в целых числах. Если ответов несколько они разделяются знаком ;. Если ответа нет, скажи 'ответа нет'")
+                resp.set_text(f"Пожалуйста ответь в целых числах. Если ответов несколько называй их через И. Если ответа нет, скажи 'ответа нет'")
                 resp.set_buttons([{"title": "Ответа нет", "hide": True}, {"title": "Выход", "hide": True}])
                 return resp.dictionary
             if (sorted(req.session_state["waitedResult"]) == sorted(res)):
@@ -143,7 +148,7 @@ def handler(event, context):
                 elif len(waited) == 1:
                     text = str(waited[0])
                 else:
-                    text = ';'.join(map(str,waited))
+                    text = ' и '.join(map(str,waited))
                 resp.set_text(random.choice(BadPhrases) + f" Ответ: {text}")
                 resp.set_session_state({"stage": req.session_state["stage"] + 1, "leftRight": True, "think": False,
                                         "score": req.session_state["score"]})
