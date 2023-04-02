@@ -140,3 +140,12 @@ def Progressions():
     text = task["text"]
 
     return text, answers, None
+
+def GeometricalExpressions():
+    tasks_ = json.load(open("geometricalExpressions.json", "r"))
+
+    task = random.choice(tasks_["list"])
+    answers = task["answers"]
+    text = task["text"]
+
+    return text, answers, None
