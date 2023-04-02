@@ -200,7 +200,9 @@ def handler(event, context):
                 resp.set_text(random.choice(GoodPhrases))
                 resp.set_session_state({"stage": req.session_state["stage"] + 1, "leftRight": True, "think": False,
                                         "score": req.session_state["score"] + 1})
-                resp.set_buttons([{"title": "Выход", "hide": True}])
+                resp.set_buttons([{"title": "Влево", "hide": True}, {"title": "Выход", "hide": True},
+                                  {"title": "Вправо", "hide": True}])
+
 
             else:
                 waited = req.session_state['waitedResult']
