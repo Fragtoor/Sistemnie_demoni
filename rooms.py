@@ -8,7 +8,7 @@ def simpleExpressionGenerator():
         str_ += random.choice(["+","-","*","/"])
     str_ += str(random.randint(1,25))
 
-    return str_, [round(eval(str_))], None
+    return str_.replace("*", "∙"), [round(eval(str_))], None
 
 def quadraticEquationGenerator():
     """Генератор полных квадратных уравнений"""
@@ -110,7 +110,7 @@ def SimpleEquation():
             continue
         break
 
-    return curPattern, [ans], None
+    return curPattern.replace("*", "∙"), [ans], None
 
 def Graphs():
     rooms_ = json.load(open("Graphs.json", "r"))
