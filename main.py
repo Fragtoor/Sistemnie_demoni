@@ -16,7 +16,8 @@ BadPhrases = ['К сожалению, это неправильный ответ
 
 EndPhrases = ["Приятно было поработать. До встречи", "Удачи в изучении математики. Пока."]
 
-HelpPhrases = ["Сейчас тебе надо решить задачу. Постарайся максимально вдуматься в её условие. У тебя всё получиться!😀", "Перед тобой есть задача. Вспомни всё, что ты проходил на уроках математики, соберись и реши её.", "Задача, которую тебе надо решить, под силам всем. Самое главное - это сосредоточиться, вдуматься и, собрав все свои знания, решить её. У тебя всё получиться💪"]
+#HelpPhrases = ["Сейчас тебе надо решить задачу. Постарайся максимально вдуматься в её условие. У тебя всё получиться!😀", "Перед тобой есть задача. Вспомни всё, что ты проходил на уроках математики, соберись и реши её.", "Задача, которую тебе надо решить, под силам всем. Самое главное - это сосредоточиться, вдуматься и, собрав все свои знания, решить её. У тебя всё получиться💪"]
+HelpPhrases = ["В данном навыке потребуется решать математические задача. После каждого ответа нужно выбирать: идти либо влево, либо вправо. С помощью кнопки или сказав \"Выход\" можно выйти из навыка. "]
 WhatYouCan = ["В мою основную функцию входит подготовка 9-ти классников к ОГЭ по математике на лучшие оценки💯", "Мне под силу придумывать разные задания, которые будут на ОГЭ по математике🧠. Благодаря мне 9-ти классники смогут подготовиться к экзамену на желаемую отметку💥", "Я умею давать разные задачки по математике, чтобы 9-ти классники сумели подготовиться к ОГЭ по математике на наивысшие баллы💯"]
 
 #тут заданы варианты комнат, их описания и функции соответствующие им.
@@ -32,15 +33,38 @@ rooms_variants = {
 
 def handler(event, context):
     global DEBUGINFO
+
+
     req = AliceRequest(event)
 
     resp = AliceResponse(req)
+
+
+    if req.command == "" and req.original_utterance == "ping":
+        resp.set_text("pong")
+        resp.end()
+        return resp.dictionary
 
     if req.is_new_session:
         answers = ['Привет! Я помогу тебе потренировать свои навыки в математике. Если желаешь закончить тренировку, скажи "закончить". Приступим?']
         resp.set_text(answers[0])
         resp.set_session_state({"stage": 1})
-        resp.set_buttons([{"title": "Поехали!", "hide": True}, {"title": "Выход", "hide": True}, {"title": "Что ты умеешь?", "hide": True}])
+        resp.set_buttons([{"title": "Поехали!", "hide": True}, {"title": "Выход", "hide": True}, {"title": "Помощь", "hide": True},{"title": "Что ты умеешь?", "hide": True}])
+
+        if (req.command.lower() == "что ты умеешь"):
+            resp.set_text(random.choice(WhatYouCan))
+            resp.set_session_state(req.session_state)
+            resp.set_buttons([{"title": "Поехали!", "hide": True}, {"title": "Выход", "hide": True},
+                              {"title": "Помощь", "hide": True}, {"title": "Что ты умеешь?", "hide": True}])
+            return resp.dictionary
+
+        if (req.command.lower() == "помощь"):
+            resp.set_text(random.choice(HelpPhrases))
+            resp.set_session_state(req.session_state)
+            resp.set_buttons([{"title": "Поехали!", "hide": True}, {"title": "Выход", "hide": True},
+                              {"title": "Помощь", "hide": True}, {"title": "Что ты умеешь?", "hide": True}])
+            return resp.dictionary
+
 
         return resp.dictionary
 
@@ -53,7 +77,14 @@ def handler(event, context):
 
         if (req.command.lower() == "что ты умеешь"):
             resp.set_text(random.choice(WhatYouCan))
-            resp.set_session_state({"stage": 1})
+            resp.set_session_state(req.session_state)
+            resp.set_buttons([{"title": "Поехали!", "hide": True}, {"title": "Выход", "hide": True},
+                              {"title": "Помощь", "hide": True}, {"title": "Что ты умеешь?", "hide": True}])
+            return resp.dictionary
+
+        if (req.command.lower() == "помощь"):
+            resp.set_text(random.choice(HelpPhrases))
+            resp.set_session_state(req.session_state)
             resp.set_buttons([{"title": "Поехали!", "hide": True}, {"title": "Выход", "hide": True},
                               {"title": "Помощь", "hide": True}, {"title": "Что ты умеешь?", "hide": True}])
             return resp.dictionary
@@ -92,6 +123,21 @@ def handler(event, context):
     if req.session_state["stage"] > 1:
         if (req.session_state["leftRight"]):
             try:
+
+                if (req.command.lower() == "помощь"):
+                    resp.set_text(random.choice(HelpPhrases))
+                    resp.set_session_state(req.session_state)
+                    resp.set_buttons([{"title": "Влево", "hide": True}, {"title": "Выход", "hide": True},
+                                      {"title": "Вправо", "hide": True}])
+                    return resp.dictionary
+
+                if (req.command.lower() == "что ты умеешь"):
+                    resp.set_text(random.choice(WhatYouCan))
+                    resp.set_session_state(req.session_state)
+                    resp.set_buttons([{"title": "Влево", "hide": True}, {"title": "Выход", "hide": True},
+                                      {"title": "Вправо", "hide": True}])
+                    return resp.dictionary
+
                 if re.search("лев|прав",req.command.lower()):
                     name = random.choice(list(rooms_variants.keys()))
                     values = rooms_variants[name]
@@ -124,8 +170,13 @@ def handler(event, context):
             if (req.command.lower() == "помощь"):
                 resp.set_text(random.choice(HelpPhrases))
                 resp.set_session_state(req.session_state)
-                resp.set_buttons([{"title": "Ответа нет", "hide": True}, {"title": "Помощь", "hide": True},
-                                  {"title": "Выход", "hide": True}])
+                resp.set_buttons([{"title": "Выход", "hide": True}])
+                return resp.dictionary
+
+            if (req.command.lower() == "что ты умеешь"):
+                resp.set_text(random.choice(WhatYouCan))
+                resp.set_session_state(req.session_state)
+                resp.set_buttons([{"title": "Выход", "hide": True}])
                 return resp.dictionary
 
             try:
@@ -148,8 +199,7 @@ def handler(event, context):
                 resp.set_text(random.choice(GoodPhrases))
                 resp.set_session_state({"stage": req.session_state["stage"] + 1, "leftRight": True, "think": False,
                                         "score": req.session_state["score"] + 1})
-                resp.set_buttons([{"title": "Влево", "hide": True}, {"title": "Выход", "hide": True},
-                                  {"title": "Вправо", "hide": True}])
+                resp.set_buttons([{"title": "Выход", "hide": True}])
 
             else:
                 waited = req.session_state['waitedResult']
