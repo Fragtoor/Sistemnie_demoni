@@ -141,6 +141,16 @@ def Progressions():
 
     return text, answers, None
 
+def Geometry():
+    rooms_ = json.load(open("Geometry.json", "r"))
+
+    room = random.choice(rooms_["list"])
+    answer = [room["answer"]]
+    image = room["image"]
+    title = room["text"]
+
+    return title, answer, image
+
 def GeometricalExpressions():
     tasks_ = json.load(open("geometricalExpressions.json", "r"))
 

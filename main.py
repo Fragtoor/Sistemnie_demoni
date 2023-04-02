@@ -29,7 +29,9 @@ rooms_variants = {
     "Вероятности": ["Ответ дайте в процентах: ", rooms.Chances],
     "Прогрессии": ["", rooms.Progressions],
     "Графики": ["", rooms.Graphs],
-    "Геометрические выражения": ["", rooms.GeometricalExpressions]
+    "Геометрические выражения": ["", rooms.GeometricalExpressions],
+    "Линейные уравнения": ["Найди X и дай ответ округляя: ", rooms.SimpleEquation]
+    "Геометрия": ["", rooms.Geometry]
 }
 
 
